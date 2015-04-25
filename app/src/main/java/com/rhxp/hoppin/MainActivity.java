@@ -5,13 +5,25 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.mapbox.mapboxsdk.api.ILatLng;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.overlay.UserLocationOverlay;
+import com.mapbox.mapboxsdk.views.MapView;
+import com.rhxp.hoppin.model.Checkin;
+
 
 public class MainActivity extends ActionBarActivity {
+
+    private MapView mMapView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mMapView = (MapView) findViewById(R.id.mapview);
+        mMapView.setCenter(new LatLng(35.777016, -78.63797));
+        mMapView.setZoom(17);
     }
 
     @Override
@@ -34,5 +46,9 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addCheckinToMap(Checkin c) {
+
     }
 }
