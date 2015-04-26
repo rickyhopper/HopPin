@@ -33,8 +33,7 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
         mMapView.setZoom(17);
 
         db = new CheckinHelper(this);
-        db.getWritableDatabase();
-        db.close();
+        db.clearLocalDB();
 
         GetCheckinsTask t = new GetCheckinsTask(this);
         t.execute();
@@ -70,5 +69,11 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
     public void onTaskComplete(TaskCode taskCode, boolean success, Object result) {
         Log.i("tag", "Task complete");
         db.addListToDB((ArrayList<Checkin>)result);
+    }
+
+    @Override
+    protected void onPause(){
+        db.close();
+        super.onPause();
     }
 }

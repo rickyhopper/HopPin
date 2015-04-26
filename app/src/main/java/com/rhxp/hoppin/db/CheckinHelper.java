@@ -18,7 +18,7 @@ import java.util.List;
  * Created by Ricky on 8/31/14.
  */
 public class CheckinHelper extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "HopPin_checkins.db";
 
     public static final String TABLE_NAME = "checkins";
@@ -101,13 +101,16 @@ public class CheckinHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             cursor.moveToFirst();
         }
+        Checkin c = null;
+        if(cursor != null){
+            double[] coords = {cursor.getDouble(3),cursor.getDouble(4)};
+            Geo g = new Geo(coords);
+            User u = new User(cursor.getString(5), cursor.getString(6), cursor.getString(7), Integer.parseInt(cursor.getString(8)));
+            //create checkin from query result
+            c = new Checkin(Integer.parseInt(cursor.getString(2)), cursor.getString(1),
+                    (g), (u),cursor.getString(9), Integer.parseInt(cursor.getString(11)), Integer.parseInt(cursor.getString(12)), cursor.getString(14));
 
-        double[] coords = {cursor.getDouble(3),cursor.getDouble(4)};
-        Geo g = new Geo(coords);
-        User u = new User(cursor.getString(5), cursor.getString(6), cursor.getString(7), Integer.parseInt(cursor.getString(8)));
-        //create checkin from query result
-        Checkin c = new Checkin(Integer.parseInt(cursor.getString(2)), cursor.getString(1),
-                (g), (u),cursor.getString(9), Integer.parseInt(cursor.getString(11)), Integer.parseInt(cursor.getString(12)), cursor.getString(14));
+        }
         //close all resources
         cursor.close();
         db.close();
@@ -143,8 +146,8 @@ public class CheckinHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    //delete a checkin
-    public void deleteCheckin(long id) {
+    //delete a checkin by serviceId
+    public void deleteCheckinByServiceId(long id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.delete(TABLE_NAME, KEY_SERVICE_ID + " = ?", new String[] { String.valueOf(id) });
@@ -154,48 +157,72 @@ public class CheckinHelper extends SQLiteOpenHelper {
 
     //delete a checkin
     public void deleteCheckin(Checkin c) {
-        deleteCheckin(c.getId());
+        deleteCheckinByServiceId(c.getId());
     }
 
     //clear db
     public void clearLocalDB() {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        db.delete(TABLE_NAME, "1 = 1", new String[0]);
+        Log.i("CheckinHelper", "Clearing db");
+        db.delete(TABLE_NAME, null, null);
 
         db.close();
+    }
+
+    //check if entry exists by service id, checkin's id
+    public boolean hasCheckin(Checkin checkin) {
+        boolean present = false;
+        SQLiteDatabase db = this.getReadableDatabase(); //open readable db instance
+
+        //query DB instance for checkin matching given id
+        Cursor cursor = db.query(TABLE_NAME, new String[] { KEY_ID, KEY_SERVICE_NAME, KEY_SERVICE_ID, KEY_LAT, KEY_LON, KEY_USER, KEY_USER_HANDLE, KEY_USER_PIC_URL, KEY_FOLLOWERS_COUNT, KEY_CONTENT, KEY_CONTENT_LINK, KEY_RETWEET_COUNT, KEY_FAVORITE_COUNT,KEY_CREATED_AT },
+                KEY_SERVICE_ID + "=?", new String[] { String.valueOf(checkin.getId()) }, null, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            present = true;
+        }
+        db.close();
+
+        return present;
     }
 
     //add a list of checkins to the db
     public void addListToDB(List<Checkin> list) {
         SQLiteDatabase db = this.getWritableDatabase(); //open writable db instance
         int numRows = (int)DatabaseUtils.queryNumEntries(db, TABLE_NAME);
-
+        Log.i("CheckinHelper", "Number of entries: "+numRows);
+        int insertIndex = 0;
         for (int i = 0; i < list.size(); i++) {
             //checkin doesn't exist already
             //create database info from data
             Checkin c = list.get(i);
-
-            ContentValues values = new ContentValues();
-            values.put(KEY_ID, i + numRows);
-            values.put(KEY_SERVICE_NAME, c.getService());
-            values.put(KEY_SERVICE_ID, c.getId());
-            values.put(KEY_LAT, c.getLat());
-            values.put(KEY_LON, c.getLon());
-            values.put(KEY_USER, c.getUser().getName());
-            values.put(KEY_USER_HANDLE, c.getUser().getScreen_name());
-            values.put(KEY_USER_PIC_URL, c.getUser().getProfile_image_url());
-            values.put(KEY_FOLLOWERS_COUNT, c.getUser().getFollowers_count());
-            values.put(KEY_CONTENT, c.getText());
-            values.put(KEY_CONTENT_LINK, c.getContentLink());
-            values.put(KEY_RETWEET_COUNT, c.getRetweet_count());
-            values.put(KEY_FAVORITE_COUNT, c.getFavorite_count());
-            values.put(KEY_CREATED_AT, c.getCreated_at());
-            Log.i("CheckinHelper", "Inserting "  +  i + numRows);
-            //insert the row into the database
-            db.insert(TABLE_NAME, null, values);
+            if(!hasCheckin(c)){
+                ContentValues values = new ContentValues();
+                values.put(KEY_ID, insertIndex + numRows);
+                values.put(KEY_SERVICE_NAME, c.getService());
+                values.put(KEY_SERVICE_ID, c.getId());
+                values.put(KEY_LAT, c.getLat());
+                values.put(KEY_LON, c.getLon());
+                values.put(KEY_USER, c.getUser().getName());
+                values.put(KEY_USER_HANDLE, c.getUser().getScreen_name());
+                values.put(KEY_USER_PIC_URL, c.getUser().getProfile_image_url());
+                values.put(KEY_FOLLOWERS_COUNT, c.getUser().getFollowers_count());
+                values.put(KEY_CONTENT, c.getText());
+                values.put(KEY_CONTENT_LINK, c.getContentLink());
+                values.put(KEY_RETWEET_COUNT, c.getRetweet_count());
+                values.put(KEY_FAVORITE_COUNT, c.getFavorite_count());
+                values.put(KEY_CREATED_AT, c.getCreated_at());
+                Log.i("CheckinHelper", "Inserting at"  +  (insertIndex + numRows));
+                //insert the row into the database
+                db.insert(TABLE_NAME, null, values);
+                insertIndex++;
+            }
+            else{
+                Log.i("CheckinHelper", "Checkin already exists: "+ c.getId());
+            }
         }
-
+        numRows = (int)DatabaseUtils.queryNumEntries(db, TABLE_NAME);
+        Log.i("CheckinHelper", "Number of entries: "+numRows);
         db.close();
     }
 }

@@ -58,7 +58,6 @@ public class GetCheckinsTask extends AsyncTask<Void, Void, String> {
             List<Checkin> checkins = CheckinList.parse(responseString);
 
             //send result to listener
-            //TODO figure out why response in andrdoid log says has no column named retweetCount
             listener.onTaskComplete(taskCode, true, checkins);
         } else {
             Log.i(TAG, "The list was not received, returning null.");
