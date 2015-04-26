@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.api.ILatLng;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.overlay.Marker;
 import com.mapbox.mapboxsdk.overlay.UserLocationOverlay;
+import com.mapbox.mapboxsdk.views.InfoWindow;
 import com.mapbox.mapboxsdk.views.MapView;
 import com.rhxp.hoppin.async.AsyncListener;
 import com.rhxp.hoppin.async.TaskCode;
@@ -23,6 +26,8 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
 
     private MapView mMapView = null;
     private CheckinHelper db;
+    private ArrayList<Checkin> feed;
+    private ArrayList<Marker> markers;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,11 +37,19 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
         mMapView.setCenter(new LatLng(35.777016, -78.63797));
         mMapView.setZoom(17);
 
+        feed = new ArrayList<Checkin>();
+        markers = new ArrayList<Marker>();
         db = new CheckinHelper(this);
         db.clearLocalDB();
 
         GetCheckinsTask t = new GetCheckinsTask(this);
         t.execute();
+    }
+
+    @Override
+    protected void onResume() {
+        db.getWritableDatabase();
+        super.onResume();
     }
 
     @Override
@@ -61,14 +74,35 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
         return super.onOptionsItemSelected(item);
     }
 
+    public void clearMap(){
+        for(Marker m: markers){
+            mMapView.removeMarker(m);
+        }
+    }
+
     public void addCheckinToMap(Checkin c) {
+        LatLng loc = new LatLng(c.getLat(),c.getLon());
+        Marker marker = new Marker(mMapView, c.getUser().getScreen_name(), c.getText() + "\n link: <a href='" + c.getContentLink() + "'>" + c.getContentLink() + "</a>" , loc);
+        markers.add(marker);
+        mMapView.addMarker(marker);
 
     }
 
     @Override
     public void onTaskComplete(TaskCode taskCode, boolean success, Object result) {
         Log.i("tag", "Task complete");
-        db.addListToDB((ArrayList<Checkin>)result);
+        if(success){
+            feed = (ArrayList<Checkin>) result;
+            db.addListToDB((ArrayList<Checkin>) result);
+            //add each checkin to map
+            for(Checkin status: feed){
+                addCheckinToMap(status);
+            }
+            Toast.makeText(MainActivity.this, "Added Markers", Toast.LENGTH_LONG).show();
+        }
+        else{
+            Toast.makeText(MainActivity.this, "Couldn't Retrieve Feed", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override

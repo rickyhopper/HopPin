@@ -177,11 +177,10 @@ public class CheckinHelper extends SQLiteOpenHelper {
         //query DB instance for checkin matching given id
         Cursor cursor = db.query(TABLE_NAME, new String[] { KEY_ID, KEY_SERVICE_NAME, KEY_SERVICE_ID, KEY_LAT, KEY_LON, KEY_USER, KEY_USER_HANDLE, KEY_USER_PIC_URL, KEY_FOLLOWERS_COUNT, KEY_CONTENT, KEY_CONTENT_LINK, KEY_RETWEET_COUNT, KEY_FAVORITE_COUNT,KEY_CREATED_AT },
                 KEY_SERVICE_ID + "=?", new String[] { String.valueOf(checkin.getId()) }, null, null, null, null);
-        if (cursor != null) {
+        if (cursor.getCount() > 0) {
             cursor.moveToFirst();
             present = true;
         }
-        db.close();
 
         return present;
     }
