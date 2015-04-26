@@ -82,7 +82,7 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
 
     public void addCheckinToMap(Checkin c) {
         LatLng loc = new LatLng(c.getLat(),c.getLon());
-        Marker marker = new Marker(mMapView, c.getUser().getScreen_name(), c.getText() + "\n link: <a href='" + c.getContentLink() + "'>" + c.getContentLink() + "</a>" , loc);
+        Marker marker = new Marker(mMapView, c.getUser().getScreen_name(), c.getText() + "\n link: " + c.getContentLink() , loc);
         markers.add(marker);
         mMapView.addMarker(marker);
 
