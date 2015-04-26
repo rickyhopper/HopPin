@@ -12,14 +12,17 @@ import com.mapbox.mapboxsdk.overlay.UserLocationOverlay;
 import com.mapbox.mapboxsdk.views.MapView;
 import com.rhxp.hoppin.async.AsyncListener;
 import com.rhxp.hoppin.async.TaskCode;
+import com.rhxp.hoppin.db.CheckinHelper;
 import com.rhxp.hoppin.model.Checkin;
 import com.rhxp.hoppin.task.GetCheckinsTask;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends ActionBarActivity implements AsyncListener {
 
     private MapView mMapView = null;
-
+    private CheckinHelper db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +31,10 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
         mMapView = (MapView) findViewById(R.id.mapview);
         mMapView.setCenter(new LatLng(35.777016, -78.63797));
         mMapView.setZoom(17);
+
+        db = new CheckinHelper(this);
+        db.getWritableDatabase();
+        db.close();
 
         GetCheckinsTask t = new GetCheckinsTask(this);
         t.execute();
@@ -62,6 +69,6 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
     @Override
     public void onTaskComplete(TaskCode taskCode, boolean success, Object result) {
         Log.i("tag", "Task complete");
-        //TODO: get tweets from db (after parsing them in through GetCheckinsTask)
+        db.addListToDB((ArrayList<Checkin>)result);
     }
 }

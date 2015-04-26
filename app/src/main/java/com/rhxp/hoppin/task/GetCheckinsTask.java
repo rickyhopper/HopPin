@@ -1,10 +1,15 @@
 package com.rhxp.hoppin.task;
 
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.util.JsonReader;
 import android.util.Log;
 
 import com.rhxp.hoppin.async.AsyncListener;
 import com.rhxp.hoppin.async.TaskCode;
+import com.rhxp.hoppin.model.Checkin;
+import com.rhxp.hoppin.db.CheckinHelper;
+import com.rhxp.hoppin.model.CheckinList;
 import com.rhxp.hoppin.remote.RemoteApiHelper;
 import com.rhxp.hoppin.remote.URLHelper;
 
@@ -31,6 +36,7 @@ public class GetCheckinsTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected String doInBackground(Void... arg0) {
+        URLHelper.setCHECKINS_URL();
         url = URLHelper.CHECKINS_URL;
         params = RemoteApiHelper.prepareEmptyParams();
         headers = RemoteApiHelper.prepareAuthHeader();
@@ -49,10 +55,11 @@ public class GetCheckinsTask extends AsyncTask<Void, Void, String> {
         if (responseString.length() > 0) {
             Log.i(TAG, "The list was gotten.");
             Log.i(TAG, responseString);
-            //TODO: add items to list and local database
+            List<Checkin> checkins = CheckinList.parse(responseString);
 
             //send result to listener
-            listener.onTaskComplete(taskCode, true, null);
+            //TODO figure out why response in andrdoid log says has no column named retweetCount
+            listener.onTaskComplete(taskCode, true, checkins);
         } else {
             Log.i(TAG, "The list was not received, returning null.");
             //send failure to listener
