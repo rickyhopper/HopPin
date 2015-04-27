@@ -16,6 +16,8 @@ import java.util.TimeZone;
 public class Checkin {
     public static int COLOR_RED = 0xffcc0000;
     public static int COLOR_BLACK = 0xff000000;
+    public static int COLOR_GREEN = 0xff00CC00;
+    public static int COLOR_BLUE = 0xff0000CC;
 
     private long id;
     private String service = "twitter";
@@ -134,14 +136,26 @@ public class Checkin {
                 + this.getLat() + ", lon=" + this.getLon() + ", user=" + user.getScreen_name() + ", text=" + this.getText() +"]";
     }
 
-    public String getColor(ArrayList<Checkin> list){
+    public int getColor(ArrayList<Checkin> list){
         int neighbors = 0;
+        int color = COLOR_BLUE;
         for(Checkin place: list){
-            if(this.isNeighbor(place)){
-                neighbors ++;
+            if(!(place.getUser().getScreen_name()).equals(this.getUser().getScreen_name())){
+                if(this.isNeighbor(place)){
+                    neighbors ++;
+                }
             }
         }
-        return "";
+        if(neighbors > 10){
+            color = COLOR_RED;
+        }
+        else if(neighbors > 5){
+            color = COLOR_GREEN;
+        }
+        else{
+
+        }
+        return color;
     }
 
     public boolean isNeighbor(Checkin c){

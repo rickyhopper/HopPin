@@ -90,7 +90,7 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
         Marker marker = new Marker(mMapView, c.getUser().getScreen_name(), c.getFormattedCreated_at() + "\n\n" + c.getText() + "\n\n link: " + c.getContentLink() , loc);
         markers.add(marker);
         Drawable d = marker.getMarker(16);
-        d.setColorFilter(new LightingColorFilter(Checkin.COLOR_BLACK, Checkin.COLOR_RED));
+        d.setColorFilter(new LightingColorFilter(Checkin.COLOR_BLACK, c.getColor(feed)));
         marker.setMarker(d);
         mMapView.addMarker(marker);
     }
