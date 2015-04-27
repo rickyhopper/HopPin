@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.api.ILatLng;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.overlay.Icon;
 import com.mapbox.mapboxsdk.overlay.Marker;
 import com.mapbox.mapboxsdk.overlay.UserLocationOverlay;
 import com.mapbox.mapboxsdk.views.InfoWindow;
@@ -82,10 +83,9 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
 
     public void addCheckinToMap(Checkin c) {
         LatLng loc = new LatLng(c.getLat(),c.getLon());
-        Marker marker = new Marker(mMapView, c.getUser().getScreen_name(), c.getText() + "\n link: " + c.getContentLink() , loc);
+        Marker marker = new Marker(mMapView, c.getUser().getScreen_name(), c.getFormattedCreated_at() + "\n\n" + c.getText() + "\n\n link: " + c.getContentLink() , loc);
         markers.add(marker);
         mMapView.addMarker(marker);
-
     }
 
     @Override

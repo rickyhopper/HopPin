@@ -6,8 +6,12 @@ package com.rhxp.hoppin.model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class Checkin {
     private long id;
@@ -18,7 +22,7 @@ public class Checkin {
     private String text;
     private int retweet_count;
     private int favorite_count;
-
+    public final double FIFTH_OF_A_MILE = 0.00028;
     public Checkin() {}
 
     public Checkin(long id, String service, Geo geo, User user, String text, int retweet_count, int favorite_count,  String created_at) {
@@ -72,8 +76,22 @@ public class Checkin {
         this.text = text;
     }
 
-    public String getCreated_at() {
+    public String getCreated_at(){
         return this.created_at;
+    }
+
+    public String getFormattedCreated_at() {
+        SimpleDateFormat readTwitterFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy");
+        SimpleDateFormat writeFormat = new SimpleDateFormat("EEE MMM dd, yyyy - hh:mm a");
+        readTwitterFormat.setTimeZone(TimeZone.getTimeZone("EST"));
+        writeFormat.setTimeZone(TimeZone.getTimeZone("EST"));
+        Date date = null;
+        try {
+            date = readTwitterFormat.parse(this.created_at);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return (date != null)?writeFormat.format(date):"";
     }
 
     public void setCreated_at(String created_at) {
@@ -111,6 +129,30 @@ public class Checkin {
     public String toString(){
         return "[id="+ this.id + ", service=" + this.service + ", lat="
                 + this.getLat() + ", lon=" + this.getLon() + ", user=" + user.getScreen_name() + ", text=" + this.getText() +"]";
+    }
+
+    public String getColor(ArrayList<Checkin> list){
+        int neighbors = 0;
+        for(Checkin place: list){
+            if(this.isNeighbor(place)){
+                neighbors ++;
+            }
+        }
+        return "";
+    }
+
+    public boolean isNeighbor(Checkin c){
+        double x;
+        double y;
+        y = Math.abs (c.getLat()- this.getLat());
+        x = Math.abs (c.getLon() - this.getLon());
+        if(x < FIFTH_OF_A_MILE ){
+            return true;
+        }
+        else if(y < FIFTH_OF_A_MILE){
+            return true;
+        }
+        return false;
     }
 
 }
