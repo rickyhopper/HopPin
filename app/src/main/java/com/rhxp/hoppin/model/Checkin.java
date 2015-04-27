@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Checkin {
+    public static int COLOR_RED = 0xffcc0000;
+    public static int COLOR_BLACK = 0xff000000;
+
     private long id;
     private String service = "twitter";
     private String created_at;
