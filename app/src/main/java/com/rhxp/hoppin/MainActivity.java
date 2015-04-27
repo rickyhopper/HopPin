@@ -1,5 +1,9 @@
 package com.rhxp.hoppin;
 
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -85,6 +89,9 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
         LatLng loc = new LatLng(c.getLat(),c.getLon());
         Marker marker = new Marker(mMapView, c.getUser().getScreen_name(), c.getFormattedCreated_at() + "\n\n" + c.getText() + "\n\n link: " + c.getContentLink() , loc);
         markers.add(marker);
+        Drawable d = marker.getMarker(16);
+        d.setColorFilter(new LightingColorFilter(Checkin.COLOR_BLACK, Checkin.COLOR_RED));
+        marker.setMarker(d);
         mMapView.addMarker(marker);
     }
 

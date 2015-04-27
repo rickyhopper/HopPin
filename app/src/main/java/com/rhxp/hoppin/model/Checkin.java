@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class Checkin {
+    public static int COLOR_RED = 0xffcc0000;
+    public static int COLOR_BLACK = 0xff000000;
+
     private long id;
     private String service = "twitter";
     private String created_at;
