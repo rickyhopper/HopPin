@@ -1,5 +1,6 @@
 package com.rhxp.hoppin;
 
+import android.content.Intent;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.api.ILatLng;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.overlay.GpsLocationProvider;
 import com.mapbox.mapboxsdk.overlay.Icon;
 import com.mapbox.mapboxsdk.overlay.Marker;
 import com.mapbox.mapboxsdk.overlay.UserLocationOverlay;
@@ -33,6 +35,7 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
     private CheckinHelper db;
     private ArrayList<Checkin> feed;
     private ArrayList<Marker> markers;
+    private GpsLocationProvider provider;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +44,8 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
         mMapView = (MapView) findViewById(R.id.mapview);
         mMapView.setCenter(new LatLng(35.777016, -78.63797));
         mMapView.setZoom(17);
+
+        provider = new GpsLocationProvider(this);
 
         feed = new ArrayList<Checkin>();
         markers = new ArrayList<Marker>();
@@ -74,6 +79,21 @@ public class MainActivity extends ActionBarActivity implements AsyncListener {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if(id == R.id.set_location){
+            UserLocationOverlay myLocationOverlay = new UserLocationOverlay(provider, mMapView);
+            myLocationOverlay.enableMyLocation();
+            myLocationOverlay.setDrawAccuracyEnabled(true);
+            mMapView.getOverlays().add(myLocationOverlay);
+            Toast.makeText(MainActivity.this, "Location Set", Toast.LENGTH_LONG).show();
+        }
+        else if(id == R.id.share_location){
+            String message = "Let's get this HopPin at " + " http://maps.google.com/?q="+ provider.getLastKnownLocation().getLatitude() + "," + provider.getLastKnownLocation().getLongitude() + " \n #HopPin";
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_TEXT, message);
+
+            startActivity(Intent.createChooser(share, "Get the party HopPin"));
         }
 
         return super.onOptionsItemSelected(item);
