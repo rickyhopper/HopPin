@@ -3,6 +3,8 @@ package com.rhxp.hoppin.model;
 /**
  * Created by rickyh on 4/23/15.
  */
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -14,10 +16,10 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class Checkin {
-    public static int COLOR_RED = 0xffcc0000;
-    public static int COLOR_BLACK = 0xff000000;
-    public static int COLOR_GREEN = 0xff00CC00;
-    public static int COLOR_BLUE = 0xff0000CC;
+    public static final int COLOR_RED = 0xffcc0000;
+    public static final int COLOR_BLACK = 0xff000000;
+    public static final int COLOR_GREEN = 0xff00CC00;
+    public static final int COLOR_BLUE = 0xff2094EE; //0xff0000CC
 
     private long id;
     private String service = "twitter";
@@ -27,7 +29,7 @@ public class Checkin {
     private String text;
     private int retweet_count;
     private int favorite_count;
-    public final double FIFTH_OF_A_MILE = 0.00028;
+    public final double FIFTH_OF_A_MILE = 0.000040000;
     public Checkin() {}
 
     public Checkin(long id, String service, Geo geo, User user, String text, int retweet_count, int favorite_count,  String created_at) {
@@ -58,7 +60,7 @@ public class Checkin {
     }
 
     public double getLat() {
-        return geo.getLat();
+         return this.geo.getLat();
     }
 
     public double getLon() {
@@ -140,33 +142,23 @@ public class Checkin {
         int neighbors = 0;
         int color = COLOR_BLUE;
         for(Checkin place: list){
-            if(!(place.getUser().getScreen_name()).equals(this.getUser().getScreen_name())){
-                if(this.isNeighbor(place)){
-                    neighbors ++;
-                }
+            if(isNeighbor(place)){
+                neighbors++;
             }
         }
-        if(neighbors > 10){
-            color = COLOR_RED;
-        }
-        else if(neighbors > 5){
-            color = COLOR_GREEN;
-        }
-        else{
-
-        }
+        if(neighbors >=4 ) return COLOR_RED;
+        if(neighbors >= 3 ) return COLOR_GREEN;
         return color;
     }
 
     public boolean isNeighbor(Checkin c){
         double x;
         double y;
-        y = Math.abs (c.getLat()- this.getLat());
+        y = Math.abs (c.getLat() - this.getLat());
         x = Math.abs (c.getLon() - this.getLon());
-        if(x < FIFTH_OF_A_MILE ){
-            return true;
-        }
-        else if(y < FIFTH_OF_A_MILE){
+        if(x == 0.00000000 && y == 0.00000000){
+            //Log.d(this.getClass().toString(), this.getUser().getScreen_name()+":"+c.getUser().getScreen_name()+" "+ c.getLon()+":x:"+this.getLon() +" / "+ c.getLat()+":y:"+this.getLat());
+            Log.d(this.getClass().toString(), this.getUser().getScreen_name()+":"+c.getUser().getScreen_name()+" x= "+x + " y= "+y);
             return true;
         }
         return false;

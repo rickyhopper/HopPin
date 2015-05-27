@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -15,5 +15,49 @@
         android:layout_height="fill_parent"
         mapbox:mapid="rdhopper.2adab863"
         mapbox:accessToken="sk.eyJ1IjoicmRob3BwZXIiLCJhIjoib1NzSkttayJ9.-ylLc7Ar6czTORoCuW2Nqw"/>
+    <Button
+        android:id="@+id/showPanelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:onClick="slideUpDown"
+        android:text="Slide up / down" />
 
-</RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/hidden_panel"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:visibility="gone" >
+        <TextView
+            android:id="@+id/noResults"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textAlignment="center"
+            android:textSize="100px"
+            android:textColor="@color/switch_thumb_normal_material_light"
+            android:text="@string/no_results"
+            android:gravity="center"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Slide up / down"
+                android:onClick="slideUpDown"/>
+
+            <ListView
+                android:id="@+id/checkinItemList"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"/>
+
+            </LinearLayout>
+
+    </RelativeLayout>
+
+</FrameLayout>

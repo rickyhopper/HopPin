@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="75dp"
+    android:background="@anim/item_background">
+    <TextView
+        android:id="@+id/checkinUserName"
+        android:layout_width="100dp"
+        android:layout_height="fill_parent"
+        android:padding="10dp"
+        android:textSize="10dp"
+        android:textColor="#09A1AE"
+        android:text="UserName"
+        />
+    <TextView
+        android:id="@+id/checkinText"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="10dp"
+        android:textSize="12dp"
+        android:textColor="#ff63ae60"
+        android:text="lorim ipsum doloret"
+        />
+
+</LinearLayout>

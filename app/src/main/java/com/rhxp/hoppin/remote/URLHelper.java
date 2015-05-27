@@ -11,7 +11,7 @@ import java.util.Date;
  * -added setter for checkin
  */
 public class URLHelper {
-    public static String CHECKINS_URL = "https://api.twitter.com/1.1/search/tweets.json?q=downtown&geocode=35.7804537,-78.6403943,10mi&result_type=recent&count=500";
+    public static String CHECKINS_URL = "https://api.twitter.com/1.1/search/tweets.json?q=&geocode=35.7804537,-78.6403943,10mi&result_type=recent&count=500";
 
     /**
      * Set the CHECKINS_URL to the span of the day before up to the next date, brings most recent tweets
